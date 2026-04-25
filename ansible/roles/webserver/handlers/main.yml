@@ -1,0 +1,18 @@
+---
+# ---------------------------------------------------------------
+# Handlers — only triggered when a task sends a notify
+#
+# we should see that Nginx only restarts if something actually
+# changed. If you run the playbook again with no changes,
+# this handler never fires. That is idempotency in action.
+# ---------------------------------------------------------------
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded         # there is no downtime there

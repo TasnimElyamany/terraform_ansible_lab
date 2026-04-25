@@ -1,0 +1,5 @@
+---
+app_name: "Lab Web App"
+app_version: "1.0.0"
+nginx_port: 80
+web_root: /var/www/html

@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566"       # LocalStack Gateway — all AWS services on one port
+      - "4510-4559:4510-4559"
+    environment:
+      - SERVICES=ec2,s3,iam,dynamodb  # only spin up what we need
+      - DEBUG=0
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEFAULT_REGION=us-east-1
+      - AWS_DEFAULT_REGION=us-east-1
+      - LOCALSTACK_HOST=localhost
+    volumes:
+      - "./localstack-data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Simulated target server Ansible will configure
+  web-server:
+    image: rastasheep/ubuntu-sshd:22.04
+    container_name: web-server
+    ports:
+      - "2222:22"         # SSH accessible on localhost:2222
+      - "8080:80"         # Nginx will be visible on localhost:8080
+    environment:
+      - ROOT_PASSWORD=labpassword

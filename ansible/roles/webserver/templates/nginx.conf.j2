@@ -1,0 +1,23 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html;
+
+    server_name _;
+
+    # Logging
+    access_log /var/log/nginx/{{ inventory_hostname }}_access.log;
+    error_log  /var/log/nginx/{{ inventory_hostname }}_error.log;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Basic security headers
+    # TEACHING POINT: this is application-level hardening done via Ansible
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+    add_header X-XSS-Protection "1; mode=block";
+}

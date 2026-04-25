@@ -1,0 +1,46 @@
+---
+# ---------------------------------------------------------------
+# Main Playbook — Configure Web Server
+#
+# Run:  ansible-playbook playbook.yml
+# Dry:  ansible-playbook playbook.yml --check
+# Tags: ansible-playbook playbook.yml --tags nginx
+# ---------------------------------------------------------------
+
+- name: Configure and deploy web server
+  hosts: webservers
+  become: yes                 # run as sudo
+
+  vars:
+    app_name: "Lab Web App"
+    app_version: "1.0.0"
+
+  pre_tasks:
+    - name: Verify connectivity
+      ping:
+      tags: always
+
+    - name: Print server info
+      debug:
+        msg: |
+          Configuring: {{ inventory_hostname }}
+          IP:          {{ ansible_host }}
+          Environment: {{ environment }}
+      tags: always
+
+  roles:
+    - role: webserver
+      tags: nginx
+
+  post_tasks:
+    - name: Confirm Nginx is responding
+      uri:
+        url: "http://{{ ansible_host }}:80"
+        status_code: 200
+      register: result
+      ignore_errors: yes       # don't fail lab if port mapping differs
+
+    - name: Show result
+      debug:
+        msg: "✅ Web server is UP at http://{{ ansible_host }}"
+      when: result.status == 200
