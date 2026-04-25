@@ -25,7 +25,7 @@ services:
 
   # Simulated target server Ansible will configure
   web-server:
-    image: rastasheep/ubuntu-sshd:22.04
+    build: rastasheep/ubuntu-sshd:22.04
     container_name: web-server
     ports:
       - "2222:22"         # SSH accessible on localhost:2222
